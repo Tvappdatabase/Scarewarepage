@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chat with Dave</title>
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+  }
+  
+  /* Widget Box */
+  .chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 320px;
+    height: 420px;
+    background-color: #0d0000;
+    border: 3px solid #ff0000;
+    box-shadow: 0 0 15px #ff0000;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 999999;
+  }
+
+  /* Header */
+  .chat-header {
+    background: linear-gradient(90deg, #8b0000, #ff0000);
+    color: #ffd700;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #ffd700;
+  }
+  .chat-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #00ff00;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #00ff00;
+    animation: blink 1s infinite alternate;
+  }
+
+  /* Messages Log */
+  .chat-messages {
+    flex: 1;
+    padding: 10px;
+    background-color: #050000;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .msg {
+    max-width: 85%;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.3;
+    word-break: break-word;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+  }
+  .msg-dave {
+    background-color: #330000;
+    color: #ff3333;
+    border: 1px solid #ff0000;
+    align-self: flex-start;
+  }
+  .msg-user {
+    background-color: #ffd700;
+    color: #000;
+    align-self: flex-end;
+  }
+
+  /* Input Box */
+  .chat-input-area {
+    display: flex;
+    padding: 8px;
+    background-color: #1a0000;
+    border-top: 2px solid #ff0000;
+  }
+  .chat-input {
+    flex: 1;
+    background-color: #000;
+    border: 1px solid #ff0000;
+    color: #fff;
+    padding: 8px;
+    font-family: monospace;
+    outline: none;
+  }
+  .chat-send {
+    background-color: #ff0000;
+    color: #ffd700;
+    border: 1px solid #ffd700;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .chat-send:hover {
+    background-color: #cc0000;
+  }
+
+  @keyframes blink {
+    from { opacity: 1; }
+    to { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-widget">
+  <div class="chat-header">
+    <div class="chat-title">
+      <div class="status-dot"></div>
+      <span>SUPPORT: DAVE</span>
+    </div>
+  </div>
+  
+  <div class="chat-messages" id="chatLog">
+    <div class="msg msg-dave">
+      DAVE HAS ENTERED THE CHAT.
+    </div>
+  </div>
+
+  <form class="chat-input-area" id="chatForm">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." required />
+    <button type="submit" class="chat-send">Send</button>
+  </form>
+</div>
+
+<script>
+  const chatLog = document.getElementById('chatLog');
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+
+  // Web Audio API beep generator
+  function playBlableep() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
+      osc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.15); // Drop to A3
+      
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } catch (e) {
+      // Audio Context restricted or unavailable
+    }
+  }
+
+  function appendMessage(text, isUser) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg ${isUser ? 'msg-user' : 'msg-dave'}`;
+    msgDiv.textContent = text;
+    chatLog.appendChild(msgDiv);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const userText = chatInput.value.trim();
+    if (!userText) return;
+
+    // Append user input
+    appendMessage(userText, true);
+    chatInput.value = '';
+
+    // Simulate Dave's instant response
+    setTimeout(() => {
+      appendMessage("YOUR DEVICE IS COMPROMISED PLEASE CALL NOW.", false);
+      playBlableep();
+    }, 300);
+  });
+</script>
+
+</body>
+</html>
